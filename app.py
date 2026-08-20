@@ -18,27 +18,61 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-.stApp {
-    background-color: #0B0B0B;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Poppins', sans-serif;
 }
 
-h1, h2, h3 {
-    color: #FFFFFF !important;
+.stApp {
+    background-color: #0B0B0B;
+    color: #F5F5F5;
 }
+
+/* ============================================================
+   HEADINGS
+   ============================================================ */
+
+h1 {
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+h2, h3 {
+    color: #FFFFFF !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================================
+   NORMAL TEXT
+   ============================================================ */
 
 p {
     color: #E5E5E5;
+    font-family: 'Poppins', sans-serif;
 }
 
 label {
     color: #E5E5E5 !important;
+    font-family: 'Poppins', sans-serif !important;
 }
+
+/* ============================================================
+   SUBTITLE
+   ============================================================ */
 
 .subtitle {
     color: #BDBDBD;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
 }
+
+/* ============================================================
+   HOW IT WORKS BOX
+   ============================================================ */
 
 .section-box {
     background-color: #171717;
@@ -47,7 +81,16 @@ label {
     border-left: 4px solid #D92D20;
     margin-bottom: 1rem;
     color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
 }
+
+.section-box b {
+    color: #FFFFFF;
+}
+
+/* ============================================================
+   MATCH BOX
+   ============================================================ */
 
 .match-box {
     background-color: #171717;
@@ -56,18 +99,25 @@ label {
     border: 1px solid #333333;
     margin: 0.8rem 0;
     color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
 }
 
 .match-box b {
     color: #FFFFFF;
 }
 
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
 .stButton > button {
     background-color: #D92D20;
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
+    padding: 0.6rem 1rem;
 }
 
 .stButton > button:hover {
@@ -75,38 +125,73 @@ label {
     color: #FFFFFF;
 }
 
+/* ============================================================
+   SELECT BOX
+   ============================================================ */
+
 .stSelectbox > div > div {
     background-color: #171717;
     color: #FFFFFF;
 }
+
+/* ============================================================
+   NUMBER INPUT
+   ============================================================ */
 
 .stNumberInput input {
     background-color: #171717;
     color: #FFFFFF;
 }
 
+/* ============================================================
+   DATE INPUT
+   ============================================================ */
+
 .stDateInput input {
     background-color: #171717;
     color: #FFFFFF;
 }
 
+/* ============================================================
+   METRICS
+   ============================================================ */
+
 [data-testid="stMetricValue"] {
     color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
 }
 
 [data-testid="stMetricLabel"] {
     color: #BDBDBD;
+    font-family: 'Poppins', sans-serif;
 }
+
+/* ============================================================
+   SUCCESS / WARNING / INFO
+   ============================================================ */
+
+[data-testid="stAlert"] {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ============================================================
+   DIVIDERS
+   ============================================================ */
 
 hr {
     border-color: #333333;
 }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
 
 .footer {
     text-align: center;
     color: #777777;
     font-size: 0.85rem;
     padding: 2rem 0 1rem 0;
+    font-family: 'Poppins', sans-serif;
 }
 
 </style>
@@ -188,7 +273,9 @@ inventory["Expiry"] = pd.to_datetime(inventory["Expiry"])
 st.title("♻️ EXPIRY EXCHANGE")
 
 st.markdown(
-    '<div class="subtitle">Don\'t buy new. Exchange what already exists.</div>',
+    '<div class="subtitle">'
+    "Don't buy new. Exchange what already exists."
+    "</div>",
     unsafe_allow_html=True
 )
 
@@ -260,6 +347,10 @@ with col1:
         key="find_match"
     ):
 
+        # ----------------------------------------------------
+        # EXPIRY CALCULATION
+        # ----------------------------------------------------
+
         today = pd.Timestamp.today().normalize()
         expiry = pd.Timestamp(expiry_date)
 
@@ -267,8 +358,10 @@ with col1:
 
         if days_left <= 30:
             risk = "🔴 High"
+
         elif days_left <= 60:
             risk = "🟠 Medium"
+
         else:
             risk = "🟢 Low"
 
@@ -277,18 +370,23 @@ with col1:
         metric1, metric2 = st.columns(2)
 
         with metric1:
+
             st.metric(
                 "Days Until Expiry",
                 days_left
             )
 
         with metric2:
+
             st.metric(
                 "Expiry Risk",
                 risk
             )
 
-        # Find matching facilities
+
+        # ----------------------------------------------------
+        # FIND MATCHES
+        # ----------------------------------------------------
 
         matches = demand[
             (demand["Product"] == product) &
@@ -318,7 +416,10 @@ with col1:
                     "✓ Quantity requirement satisfied."
                 )
 
-                # Financial calculation
+
+                # ------------------------------------------------
+                # FINANCIAL CALCULATION
+                # ------------------------------------------------
 
                 unit_price = product_prices[product]
 
@@ -340,18 +441,21 @@ with col1:
                 money1, money2, money3 = st.columns(3)
 
                 with money1:
+
                     st.metric(
                         "Normal Purchase",
                         f"${normal_cost:,.2f}"
                     )
 
                 with money2:
+
                     st.metric(
                         "Buyer Saves",
                         f"${buyer_savings:,.2f}"
                     )
 
                 with money3:
+
                     st.metric(
                         "Platform Revenue",
                         f"${platform_fee:,.2f}"
@@ -362,11 +466,17 @@ with col1:
                     "redirected instead of requiring a new purchase."
                 )
 
+
+                # ------------------------------------------------
+                # PROPOSE EXCHANGE
+                # ------------------------------------------------
+
                 if st.button(
                     "🤝 Propose Exchange",
                     key=f"proposal_{match['Facility']}",
                     use_container_width=True
                 ):
+
                     st.success(
                         f"Exchange proposal created for "
                         f"{match['Facility']}."
@@ -452,6 +562,11 @@ with col2:
                     f"${savings:,.2f}"
                 )
 
+
+                # ------------------------------------------------
+                # REQUEST EXCHANGE
+                # ------------------------------------------------
+
                 if st.button(
                     "🤝 Request Exchange",
                     key=(
@@ -461,6 +576,7 @@ with col2:
                     ),
                     use_container_width=True
                 ):
+
                     st.success(
                         f"Exchange request sent to "
                         f"{supply['Facility']}."
@@ -537,6 +653,13 @@ with step3:
 # ============================================================
 # FOOTER
 # ============================================================
+
+st.markdown(
+    '<div class="footer">'
+    '♻️ Consume less. Waste less. Exchange smarter.'
+    '</div>',
+    unsafe_allow_html=True
+)
 
 st.markdown(
     '<div class="footer">♻️ Consume less. Waste less. Exchange smarter.</div>',
