@@ -660,8 +660,3 @@ st.markdown(
     '</div>',
     unsafe_allow_html=True
 )
-
-st.markdown(
-    '<div class="footer">♻️ Consume less. Waste less. Exchange smarter.</div>',
-    unsafe_allow_html=True
-)
