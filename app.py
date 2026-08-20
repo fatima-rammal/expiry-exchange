@@ -12,6 +12,16 @@ st.set_page_config(
 )
 
 # ============================================================
+# PRODUCT PRICES
+# ============================================================
+
+product_prices = {
+    "Gauze": 1.00,
+    "Gloves": 0.40,
+    "IV Sets": 2.50
+}
+
+# ============================================================
 # TITLE
 # ============================================================
 
@@ -25,6 +35,61 @@ st.write(
 )
 
 st.divider()
+
+# ============================================================
+# DEMAND DATA
+# ============================================================
+
+demand = pd.DataFrame({
+    "Facility": [
+        "Medical Center",
+        "Community Clinic",
+        "University Hospital"
+    ],
+    "Product": [
+        "Gloves",
+        "Gauze",
+        "Gloves"
+    ],
+    "Quantity Needed": [
+        2000,
+        500,
+        1500
+    ]
+})
+
+# ============================================================
+# INVENTORY DATA
+# ============================================================
+
+inventory = pd.DataFrame({
+    "Facility": [
+        "City Hospital",
+        "City Hospital",
+        "Medical Center",
+        "Community Clinic"
+    ],
+    "Product": [
+        "Gauze",
+        "Gloves",
+        "Gauze",
+        "Gloves"
+    ],
+    "Quantity": [
+        1000,
+        5000,
+        200,
+        3000
+    ],
+    "Expiry": [
+        "2026-11-15",
+        "2026-10-20",
+        "2026-12-10",
+        "2026-09-30"
+    ]
+})
+
+inventory["Expiry"] = pd.to_datetime(inventory["Expiry"])
 
 # ============================================================
 # MAIN COLUMNS
@@ -41,35 +106,36 @@ with col1:
     st.subheader("🏥 I HAVE SURPLUS")
 
     st.write(
-        "Tell us about healthcare supplies "
-        "you have available."
+        "List unused healthcare supplies "
+        "that may expire before they are used."
     )
 
     product = st.selectbox(
         "What product do you have?",
-        ["Gauze", "Gloves", "IV Sets"]
+        ["Gauze", "Gloves", "IV Sets"],
+        key="surplus_product"
     )
 
     quantity = st.number_input(
         "Quantity available",
         min_value=1,
-        value=100
+        value=100,
+        key="surplus_quantity"
     )
 
     expiry_date = st.date_input(
-        "Expiry date"
+        "Expiry date",
+        key="surplus_expiry"
     )
 
     if st.button("🔎 Find a Match"):
-
-        # ----------------------------------------------------
-        # CALCULATE EXPIRY RISK
-        # ----------------------------------------------------
 
         today = pd.Timestamp.today().normalize()
         expiry = pd.Timestamp(expiry_date)
 
         days_left = (expiry - today).days
+
+        # Expiry risk
 
         if days_left <= 30:
             risk = "🔴 High"
@@ -92,42 +158,12 @@ with col1:
             risk
         )
 
-        # ----------------------------------------------------
-        # DEMAND DATA
-        # ----------------------------------------------------
-
-        demand = pd.DataFrame({
-            "Facility": [
-                "Medical Center",
-                "Community Clinic",
-                "University Hospital"
-            ],
-
-            "Product": [
-                "Gloves",
-                "Gauze",
-                "Gloves"
-            ],
-
-            "Quantity Needed": [
-                2000,
-                500,
-                1500
-            ]
-        })
-
-        # ----------------------------------------------------
-        # FIND MATCHES
-        # ----------------------------------------------------
+        # Find potential buyers
 
         matches = demand[
             (demand["Product"] == product) &
             (demand["Quantity Needed"] <= quantity)
         ]
-
-        # ----------------------------------------------------
-        # DISPLAY MATCHES
-        # ----------------------------------------------------
 
         if len(matches) > 0:
 
@@ -140,46 +176,39 @@ with col1:
                 )
 
                 st.write(
-                    f"Needs: **{match['Quantity Needed']:,} "
+                    f"Needs **{match['Quantity Needed']:,} "
                     f"{product}**"
                 )
 
                 st.write(
-                    f"Your available quantity: "
-                    f"**{quantity:,}**"
+                    f"You have **{quantity:,} {product}**"
                 )
 
                 st.success(
                     "✅ Quantity requirement satisfied!"
                 )
 
-                # ------------------------------------------------
-                # FINANCIAL IMPACT
-                # ------------------------------------------------
+                # Financial calculation
 
-                unit_price = 0.40
+                unit_price = product_prices[product]
 
                 matched_quantity = min(
                     quantity,
                     match["Quantity Needed"]
                 )
 
-                # Normal purchase cost
                 normal_cost = (
                     matched_quantity * unit_price
                 )
 
-                # 20% discount through Expiry Exchange
                 exchange_cost = (
                     normal_cost * 0.80
                 )
 
-                # Buyer savings
                 buyer_savings = (
                     normal_cost - exchange_cost
                 )
 
-                # 5% platform transaction fee
                 platform_fee = (
                     exchange_cost * 0.05
                 )
@@ -212,13 +241,10 @@ with col1:
                     )
 
                 st.info(
-                    f"♻️ **{matched_quantity:,} units** could be "
-                    f"redirected instead of requiring a new purchase."
+                    f"♻️ **{matched_quantity:,} units** "
+                    f"could be redirected instead of "
+                    f"requiring a new purchase."
                 )
-
-                # ------------------------------------------------
-                # PROPOSE EXCHANGE
-                # ------------------------------------------------
 
                 if st.button(
                     "🤝 Propose Exchange",
@@ -226,13 +252,8 @@ with col1:
                 ):
 
                     st.success(
-                        f"🎉 Exchange proposal created for "
-                        f"{match['Facility']}!"
-                    )
-
-                    st.write(
-                        "The receiving facility can review "
-                        "the available quantity and proposed exchange."
+                        f"🎉 Exchange proposal created "
+                        f"for {match['Facility']}!"
                     )
 
         else:
@@ -241,7 +262,6 @@ with col1:
                 "No suitable facility was found "
                 "for this supply."
             )
-
 
 # ============================================================
 # I NEED SUPPLIES
@@ -256,11 +276,87 @@ with col2:
         "instead of buying new."
     )
 
-    st.info(
-        "The demand-side matching system "
-        "will be available here."
+    needed_product = st.selectbox(
+        "What do you need?",
+        ["Gauze", "Gloves", "IV Sets"],
+        key="needed_product"
     )
 
+    needed_quantity = st.number_input(
+        "Quantity needed",
+        min_value=1,
+        value=500,
+        key="needed_quantity"
+    )
+
+    if st.button("🔎 Search Surplus"):
+
+        available = inventory[
+            (inventory["Product"] == needed_product) &
+            (inventory["Quantity"] >= needed_quantity)
+        ]
+
+        if len(available) > 0:
+
+            st.subheader("🎯 Surplus Available!")
+
+            for _, supply in available.iterrows():
+
+                days_left = (
+                    supply["Expiry"] -
+                    pd.Timestamp.today().normalize()
+                ).days
+
+                unit_price = product_prices[needed_product]
+
+                normal_cost = (
+                    needed_quantity * unit_price
+                )
+
+                exchange_cost = (
+                    normal_cost * 0.80
+                )
+
+                savings = (
+                    normal_cost - exchange_cost
+                )
+
+                st.write(
+                    f"🏥 **{supply['Facility']}**"
+                )
+
+                st.write(
+                    f"📦 Available: "
+                    f"**{supply['Quantity']:,} {needed_product}**"
+                )
+
+                st.write(
+                    f"⏳ Days until expiry: "
+                    f"**{days_left}**"
+                )
+
+                st.metric(
+                    "Estimated Saving",
+                    f"${savings:,.2f}"
+                )
+
+                if st.button(
+                    "🤝 Request Exchange",
+                    key=f"request_{supply['Facility']}_{needed_product}"
+                ):
+
+                    st.success(
+                        f"🎉 Exchange request sent to "
+                        f"{supply['Facility']}!"
+                    )
+
+                st.divider()
+
+        else:
+
+            st.warning(
+                "No suitable surplus was found."
+            )
 
 # ============================================================
 # EXAMPLE INVENTORY
@@ -270,49 +366,16 @@ st.divider()
 
 st.subheader("📦 Example Inventory")
 
-inventory = pd.DataFrame({
+display_inventory = inventory.copy()
 
-    "Facility": [
-        "City Hospital",
-        "City Hospital",
-        "Medical Center",
-        "Community Clinic"
-    ],
-
-    "Product": [
-        "Gauze",
-        "Gloves",
-        "Gauze",
-        "Gloves"
-    ],
-
-    "Quantity": [
-        1000,
-        5000,
-        200,
-        3000
-    ],
-
-    "Expiry": [
-        "2026-11-15",
-        "2026-10-20",
-        "2026-12-10",
-        "2026-09-30"
-    ],
-
-    "Unit Price": [
-        1.00,
-        0.40,
-        1.00,
-        0.40
-    ]
-})
-
-st.dataframe(
-    inventory,
-    use_container_width=True
+display_inventory["Expiry"] = (
+    display_inventory["Expiry"].dt.strftime("%Y-%m-%d")
 )
 
+st.dataframe(
+    display_inventory,
+    use_container_width=True
+)
 
 # ============================================================
 # HOW IT WORKS
@@ -329,8 +392,8 @@ with step1:
     st.write("### 1️⃣ List")
 
     st.write(
-        "Healthcare facilities list surplus "
-        "supplies that may expire."
+        "Facilities list surplus supplies "
+        "before they expire."
     )
 
 with step2:
@@ -338,7 +401,7 @@ with step2:
     st.write("### 2️⃣ Match")
 
     st.write(
-        "Expiry Exchange identifies facilities "
+        "The platform finds facilities "
         "that need those supplies."
     )
 
@@ -350,8 +413,3 @@ with step3:
         "The buyer saves money, surplus is reused, "
         "and Expiry Exchange earns a small transaction fee."
     )
-
-st.dataframe(
-    inventory,
-    use_container_width=True
-)
