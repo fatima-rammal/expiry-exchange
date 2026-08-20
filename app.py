@@ -3,7 +3,7 @@ import pandas as pd
 
 
 # ============================================================
-# PAGE SETTINGS
+# PAGE
 # ============================================================
 
 st.set_page_config(
@@ -14,7 +14,7 @@ st.set_page_config(
 
 
 # ============================================================
-# CUSTOM STYLE
+# DESIGN
 # ============================================================
 
 st.markdown("""
@@ -34,93 +34,52 @@ html, body, [class*="css"] {
 .block-container {
     max-width: 1100px;
     padding-top: 40px;
-    padding-bottom: 50px;
+    padding-bottom: 40px;
 }
-
-/* Headings */
 
 h1, h2, h3 {
     color: #FFFFFF !important;
-    font-family: 'Inter', sans-serif !important;
 }
-
-h1 {
-    font-size: 2.4rem !important;
-    font-weight: 700 !important;
-}
-
-h2 {
-    font-size: 1.4rem !important;
-    font-weight: 600 !important;
-}
-
-h3 {
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-}
-
-/* Text */
 
 p {
     color: #B8B8B8;
 }
 
-/* Brand */
-
 .brand {
     color: #D94A3A;
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 2px;
 }
 
-/* Hero */
-
-.hero-subtitle {
+.subtitle {
     color: #999999;
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 16px;
     max-width: 650px;
+    line-height: 1.6;
 }
-
-/* Panels */
-
-.panel {
-    background-color: #111111;
-    border: 1px solid #252525;
-    border-radius: 8px;
-    padding: 24px;
-}
-
-/* Section label */
 
 .section-label {
     color: #777777;
-    font-size: 0.7rem;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
 }
-
-/* Buttons */
 
 .stButton > button {
     background-color: #D94A3A;
     color: white;
-    border: 1px solid #D94A3A;
+    border: none;
     border-radius: 6px;
-    font-family: 'Inter', sans-serif;
     font-weight: 600;
     min-height: 42px;
 }
 
 .stButton > button:hover {
     background-color: #B83B2E;
-    border-color: #B83B2E;
     color: white;
 }
-
-/* Inputs */
 
 .stSelectbox > div > div,
 .stNumberInput > div > div,
@@ -129,32 +88,19 @@ p {
 }
 
 input {
-    color: #FFFFFF !important;
+    color: white !important;
 }
 
-/* Metrics */
-
 [data-testid="stMetricValue"] {
-    color: #FFFFFF !important;
+    color: white !important;
 }
 
 [data-testid="stMetricLabel"] {
     color: #888888 !important;
 }
 
-/* Dividers */
-
 hr {
     border-color: #252525 !important;
-}
-
-/* Footer */
-
-.footer {
-    color: #666666;
-    font-size: 0.75rem;
-    text-align: center;
-    padding-top: 30px;
 }
 
 </style>
@@ -165,14 +111,12 @@ hr {
 # DEMO DATA
 # ============================================================
 
-product_prices = {
+prices = {
     "Gauze": 1.00,
     "Gloves": 0.40,
     "IV Sets": 2.50
 }
 
-
-# Facilities that need supplies
 
 demand = pd.DataFrame({
     "Facility": [
@@ -192,8 +136,6 @@ demand = pd.DataFrame({
     ]
 })
 
-
-# Facilities with surplus
 
 inventory = pd.DataFrame({
     "Facility": [
@@ -237,10 +179,10 @@ st.markdown(
 st.title("Healthcare surplus, before it expires.")
 
 st.markdown(
-    '<div class="hero-subtitle">'
-    'Connect healthcare facilities with unused supplies '
-    'before they expire — reducing waste and unnecessary purchases.'
-    '</div>',
+    '<div class="subtitle">'
+    "Connect healthcare facilities with unused supplies "
+    "before they expire, reducing waste and unnecessary purchases."
+    "</div>",
     unsafe_allow_html=True
 )
 
@@ -248,10 +190,10 @@ st.write("")
 
 
 # ============================================================
-# MAIN INTERFACE
+# TWO SIDES
 # ============================================================
 
-left, right = st.columns(2, gap="large")
+left, right = st.columns(2)
 
 
 # ============================================================
@@ -265,7 +207,7 @@ with left:
         unsafe_allow_html=True
     )
 
-    st.subheader("I have surplus")
+    st.header("I have surplus")
 
     st.write(
         "List supplies that your facility no longer needs."
@@ -290,9 +232,7 @@ with left:
         key="surplus_expiry"
     )
 
-    st.write("")
-
-    find_button = st.button(
+    find_match = st.button(
         "Find a facility",
         use_container_width=True,
         key="find_match"
@@ -310,7 +250,7 @@ with right:
         unsafe_allow_html=True
     )
 
-    st.subheader("I need supplies")
+    st.header("I need supplies")
 
     st.write(
         "Search existing surplus before buying new stock."
@@ -330,9 +270,7 @@ with right:
         key="needed_quantity"
     )
 
-    st.write("")
-
-    search_button = st.button(
+    search_surplus = st.button(
         "Search surplus",
         use_container_width=True,
         key="search_surplus"
@@ -340,10 +278,10 @@ with right:
 
 
 # ============================================================
-# SURPLUS MATCHING
+# FIND A FACILITY
 # ============================================================
 
-if find_button:
+if find_match:
 
     st.divider()
 
@@ -352,66 +290,63 @@ if find_button:
         unsafe_allow_html=True
     )
 
-    today = pd.Timestamp.today().normalize()
-    expiry = pd.Timestamp(surplus_expiry)
-
-    days_left = (expiry - today).days
-
     matches = demand[
-        (demand["Product"] == surplus_product) &
+        (demand["Product"] == surplus_product)
+        &
         (demand["Quantity Needed"] <= surplus_quantity)
     ]
 
-    if len(matches) > 0:
+    if len(matches) == 0:
+
+        st.warning(
+            "No facility currently needs this quantity."
+        )
+
+    else:
 
         st.subheader("Facilities that may need this supply")
 
+        today = pd.Timestamp.today().normalize()
+        expiry = pd.Timestamp(surplus_expiry)
+        days_left = (expiry - today).days
+
         for _, match in matches.iterrows():
 
-            matched_quantity = min(
+            quantity = min(
                 surplus_quantity,
                 match["Quantity Needed"]
             )
 
-            normal_cost = (
-                matched_quantity *
-                product_prices[surplus_product]
-            )
+            normal_cost = quantity * prices[surplus_product]
 
             exchange_cost = normal_cost * 0.80
 
             savings = normal_cost - exchange_cost
 
             st.write("")
-
-            st.write(
-                f"### {match['Facility']}"
-            )
+            st.write(f"**{match['Facility']}**")
 
             st.caption(
                 f"Needs {match['Quantity Needed']:,} "
-                f"{surplus_product} · "
+                f"{surplus_product} | "
                 f"You have {surplus_quantity:,}"
             )
 
-            result_col1, result_col2, result_col3 = st.columns(3)
+            col1, col2, col3 = st.columns(3)
 
-            with result_col1:
-
+            with col1:
                 st.metric(
                     "Available",
                     f"{surplus_quantity:,}"
                 )
 
-            with result_col2:
-
+            with col2:
                 st.metric(
                     "Days to expiry",
                     days_left
                 )
 
-            with result_col3:
-
+            with col3:
                 st.metric(
                     "Estimated saving",
                     f"${savings:,.2f}"
@@ -424,24 +359,17 @@ if find_button:
             ):
 
                 st.success(
-                    f"Exchange proposal sent to "
-                    f"{match['Facility']}."
+                    f"Proposal sent to {match['Facility']}."
                 )
 
             st.divider()
 
-    else:
-
-        st.warning(
-            "No facility currently matches this supply."
-        )
-
 
 # ============================================================
-# SURPLUS SEARCH
+# SEARCH SURPLUS
 # ============================================================
 
-if search_button:
+if search_surplus:
 
     st.divider()
 
@@ -451,24 +379,32 @@ if search_button:
     )
 
     available = inventory[
-        (inventory["Product"] == needed_product) &
+        (inventory["Product"] == needed_product)
+        &
         (inventory["Quantity"] >= needed_quantity)
     ]
 
-    if len(available) > 0:
+    if len(available) == 0:
+
+        st.warning(
+            "No suitable surplus is currently available."
+        )
+
+    else:
 
         st.subheader("Available inventory")
 
         for _, supply in available.iterrows():
 
+            today = pd.Timestamp.today().normalize()
+
             days_left = (
-                supply["Expiry"]
-                - pd.Timestamp.today().normalize()
+                supply["Expiry"] - today
             ).days
 
             normal_cost = (
-                needed_quantity *
-                product_prices[needed_product]
+                needed_quantity
+                * prices[needed_product]
             )
 
             exchange_cost = normal_cost * 0.80
@@ -476,34 +412,28 @@ if search_button:
             savings = normal_cost - exchange_cost
 
             st.write("")
-
-            st.write(
-                f"### {supply['Facility']}"
-            )
+            st.write(f"**{supply['Facility']}**")
 
             st.caption(
                 f"{supply['Quantity']:,} "
                 f"{needed_product} available"
             )
 
-            result_col1, result_col2, result_col3 = st.columns(3)
+            col1, col2, col3 = st.columns(3)
 
-            with result_col1:
-
+            with col1:
                 st.metric(
                     "Available",
                     f"{supply['Quantity']:,}"
                 )
 
-            with result_col2:
-
+            with col2:
                 st.metric(
                     "Days to expiry",
                     days_left
                 )
 
-            with result_col3:
-
+            with col3:
                 st.metric(
                     "Estimated saving",
                     f"${savings:,.2f}"
@@ -511,11 +441,7 @@ if search_button:
 
             if st.button(
                 "Request exchange",
-                key=(
-                    f"request_"
-                    f"{supply['Facility']}_"
-                    f"{needed_product}"
-                ),
+                key=f"request_{supply['Facility']}_{needed_product}",
                 use_container_width=True
             ):
 
@@ -525,44 +451,32 @@ if search_button:
 
             st.divider()
 
-    else:
-
-        st.warning(
-            "No suitable surplus is currently available."
-        )
-
 
 # ============================================================
 # BUSINESS MODEL
 # ============================================================
-
-st.divider()
 
 st.markdown(
     '<div class="section-label">BUSINESS MODEL</div>',
     unsafe_allow_html=True
 )
 
-st.subheader("We make money when facilities save money.")
+st.header("We make money when facilities save money.")
 
-business_col1, business_col2 = st.columns(2)
+col1, col2 = st.columns(2)
 
-with business_col1:
+with col1:
 
     st.write(
-        "Expiry Exchange takes a small transaction fee "
+        "Expiry Exchange charges a small transaction fee "
         "when a successful exchange is completed."
     )
 
-with business_col2:
+with col2:
 
     st.metric(
-        "Example transaction fee",
+        "Illustrative transaction fee",
         "5%"
-    )
-
-    st.caption(
-        "Illustrative rate for the prototype."
     )
 
 
@@ -580,8 +494,7 @@ st.markdown(
 display_inventory = inventory.copy()
 
 display_inventory["Expiry"] = (
-    display_inventory["Expiry"]
-    .dt.strftime("%d %b %Y")
+    display_inventory["Expiry"].dt.strftime("%d %b %Y")
 )
 
 st.dataframe(
@@ -595,14 +508,6 @@ st.dataframe(
 # FOOTER
 # ============================================================
 
-st.markdown(
-    '<div class="footer">'
-    'EXPIRY EXCHANGE · Prototype'
-    '</div>',
-    unsafe_allow_html=True
-)
-    '<div class="footer">'
-    'EXPIRY EXCHANGE · Prototype'
-    '</div>',
-    unsafe_allow_html=True
-)
+st.divider()
+
+st.caption("EXPIRY EXCHANGE · Prototype")
