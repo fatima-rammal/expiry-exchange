@@ -12,56 +12,55 @@ st.set_page_config(
 )
 
 # ============================================================
-# SIMPLE DESIGN
+# DESIGN
 # ============================================================
 
 st.markdown("""
 <style>
 
-    /* Page background */
+    /* Main background */
     .stApp {
-        background-color: #F7FBFA;
+        background-color: #FDE8E7;
     }
 
-    /* Main title */
+    /* Main headings */
     h1 {
-        color: #176B62 !important;
+        color: #B42318 !important;
     }
 
-    /* Section headings */
     h2, h3 {
-        color: #176B62 !important;
+        color: #B42318 !important;
     }
 
-    /* Small subtitle */
+    /* Subtitle */
     .subtitle {
-        color: #55706C;
+        color: #6B3A37;
         font-size: 1.1rem;
         margin-bottom: 1rem;
     }
 
-    /* Simple section box */
+    /* Small information section */
     .section-box {
-        background-color: #EAF5F3;
+        background-color: #FFF8F7;
         padding: 1rem 1.2rem;
         border-radius: 10px;
-        border-left: 4px solid #2A8C80;
+        border-left: 4px solid #D92D20;
         margin-bottom: 1rem;
     }
 
-    /* Match box */
+    /* Match result */
     .match-box {
-        background-color: white;
+        background-color: #FFFFFF;
         padding: 1rem 1.2rem;
         border-radius: 10px;
-        border: 1px solid #D7E7E4;
+        border: 1px solid #F0C8C5;
         margin: 0.8rem 0;
     }
 
     /* Footer */
     .footer {
         text-align: center;
-        color: #708582;
+        color: #795A57;
         font-size: 0.85rem;
         padding: 2rem 0 1rem 0;
     }
