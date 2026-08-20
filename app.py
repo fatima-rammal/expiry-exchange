@@ -51,19 +51,78 @@ with col1:
         "Expiry date"
     )
 
-    if st.button("🔎 Check expiry risk"):
+   if st.button("🔎 Find a Match"):
 
-        today = pd.Timestamp.today().normalize()
-        expiry = pd.Timestamp(expiry_date)
+    today = pd.Timestamp.today().normalize()
+    expiry = pd.Timestamp(expiry_date)
 
-        days_left = (expiry - today).days
+    days_left = (expiry - today).days
 
-        if days_left <= 30:
-            risk = "🔴 High"
-        elif days_left <= 60:
-            risk = "🟠 Medium"
-        else:
-            risk = "🟢 Low"
+    # Calculate expiry risk
+    if days_left <= 30:
+        risk = "🔴 High"
+    elif days_left <= 60:
+        risk = "🟠 Medium"
+    else:
+        risk = "🟢 Low"
+
+    st.success("Inventory analyzed!")
+
+    st.metric("Days until expiry", days_left)
+
+    st.write("### Expiry Risk:", risk)
+
+    # -----------------------------
+    # Find potential buyers
+    # -----------------------------
+
+    demand = pd.DataFrame({
+        "Facility": [
+            "Medical Center",
+            "Community Clinic",
+            "University Hospital"
+        ],
+        "Product": [
+            "Gloves",
+            "Gauze",
+            "Gloves"
+        ],
+        "Quantity Needed": [
+            2000,
+            500,
+            1500
+        ]
+    })
+
+    matches = demand[
+        (demand["Product"] == product) &
+        (demand["Quantity Needed"] <= quantity)
+    ]
+
+    if len(matches) > 0:
+
+        st.subheader("🎯 Potential Match Found!")
+
+        for _, match in matches.iterrows():
+
+            st.write(
+                f"🏥 **{match['Facility']}** needs "
+                f"**{match['Quantity Needed']:,} {product}**"
+            )
+
+            st.write(
+                f"Your available quantity: "
+                f"**{quantity:,}**"
+            )
+
+            st.success("✅ Quantity requirement satisfied!")
+
+    else:
+
+        st.warning(
+            "No suitable facility was found "
+            "for this supply."
+        )
 
         st.success("Inventory checked!")
 
