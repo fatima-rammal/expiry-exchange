@@ -27,29 +27,63 @@ st.divider()
 # -----------------------------
 # Main choices
 # -----------------------------
+
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("🏥 I HAVE SURPLUS")
     st.write(
-        "I have unused healthcare supplies "
-        "that may not be used before expiry."
+        "Tell us about supplies you have available."
     )
 
-    if st.button("Find a facility that needs them"):
-        st.success("Great! We'll help you find a match.")
+    product = st.selectbox(
+        "What product do you have?",
+        ["Gauze", "Gloves", "IV Sets"]
+    )
+
+    quantity = st.number_input(
+        "Quantity available",
+        min_value=1,
+        value=100
+    )
+
+    expiry_date = st.date_input(
+        "Expiry date"
+    )
+
+    if st.button("🔎 Check expiry risk"):
+
+        today = pd.Timestamp.today().normalize()
+        expiry = pd.Timestamp(expiry_date)
+
+        days_left = (expiry - today).days
+
+        if days_left <= 30:
+            risk = "🔴 High"
+        elif days_left <= 60:
+            risk = "🟠 Medium"
+        else:
+            risk = "🟢 Low"
+
+        st.success("Inventory checked!")
+
+        st.metric(
+            "Days until expiry",
+            days_left
+        )
+
+        st.write("### Expiry Risk:", risk)
 
 with col2:
     st.subheader("🔎 I NEED SUPPLIES")
     st.write(
-        "I need a healthcare supply "
-        "and want to avoid buying new."
+        "Search for available surplus "
+        "instead of buying new."
     )
 
-    if st.button("Search available supplies"):
-        st.success("Let's find available surplus!")
-
-st.divider()
+    st.info(
+        "The matching system will be available here."
+    )
 
 # -----------------------------
 # Simple inventory
