@@ -18,161 +18,96 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-    /* ========================================================
-       MAIN BACKGROUND
-       ======================================================== */
+.stApp {
+    background-color: #0B0B0B;
+}
 
-    .stApp {
-        background-color: #0B0B0B;
-        color: #F5F5F5;
-    }
+h1, h2, h3 {
+    color: #FFFFFF !important;
+}
 
-    /* ========================================================
-       HEADINGS
-       ======================================================== */
+p {
+    color: #E5E5E5;
+}
 
-    h1 {
-        color: #FFFFFF !important;
-    }
+label {
+    color: #E5E5E5 !important;
+}
 
-    h2, h3 {
-        color: #FFFFFF !important;
-    }
+.subtitle {
+    color: #BDBDBD;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
 
-    /* ========================================================
-       NORMAL TEXT
-       ======================================================== */
+.section-box {
+    background-color: #171717;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border-left: 4px solid #D92D20;
+    margin-bottom: 1rem;
+    color: #FFFFFF;
+}
 
-    p {
-        color: #E5E5E5;
-    }
+.match-box {
+    background-color: #171717;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #333333;
+    margin: 0.8rem 0;
+    color: #FFFFFF;
+}
 
-    label {
-        color: #E5E5E5 !important;
-    }
+.match-box b {
+    color: #FFFFFF;
+}
 
-    /* ========================================================
-       SUBTITLE
-       ======================================================== */
+.stButton > button {
+    background-color: #D92D20;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
 
-    .subtitle {
-        color: #BDBDBD;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
+.stButton > button:hover {
+    background-color: #B42318;
+    color: #FFFFFF;
+}
 
-    /* ========================================================
-       HOW IT WORKS BOX
-       ======================================================== */
+.stSelectbox > div > div {
+    background-color: #171717;
+    color: #FFFFFF;
+}
 
-    .section-box {
-        background-color: #171717;
-        padding: 1rem 1.2rem;
-        border-radius: 10px;
-        border-left: 4px solid #D92D20;
-        margin-bottom: 1rem;
-        color: #FFFFFF;
-    }
+.stNumberInput input {
+    background-color: #171717;
+    color: #FFFFFF;
+}
 
-    .section-box b {
-        color: #FFFFFF;
-    }
+.stDateInput input {
+    background-color: #171717;
+    color: #FFFFFF;
+}
 
-    /* ========================================================
-       MATCH BOX
-       ======================================================== */
+[data-testid="stMetricValue"] {
+    color: #FFFFFF;
+}
 
-    .match-box {
-        background-color: #171717;
-        padding: 1rem 1.2rem;
-        border-radius: 10px;
-        border: 1px solid #333333;
-        margin: 0.8rem 0;
-        color: #FFFFFF;
-    }
+[data-testid="stMetricLabel"] {
+    color: #BDBDBD;
+}
 
-    .match-box b {
-        color: #FFFFFF;
-    }
+hr {
+    border-color: #333333;
+}
 
-    /* ========================================================
-       BUTTONS
-       ======================================================== */
-
-    .stButton > button {
-        background-color: #D92D20;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-
-    .stButton > button:hover {
-        background-color: #B42318;
-        color: white;
-    }
-
-    /* ========================================================
-       INPUT BOXES
-       ======================================================== */
-
-    .stSelectbox > div > div {
-        background-color: #171717;
-        color: white;
-    }
-
-    .stNumberInput > div > div > input {
-        background-color: #171717;
-        color: white;
-    }
-
-    /* ========================================================
-       DATE INPUT
-       ======================================================== */
-
-    .stDateInput > div > div > input {
-        background-color: #171717;
-        color: white;
-    }
-
-    /* ========================================================
-       DATAFRAME
-       ======================================================== */
-
-    [data-testid="stDataFrame"] {
-        background-color: #171717;
-    }
-
-    /* ========================================================
-       METRICS
-       ======================================================== */
-
-    [data-testid="stMetricValue"] {
-        color: #FFFFFF;
-    }
-
-    [data-testid="stMetricLabel"] {
-        color: #BDBDBD;
-    }
-
-    /* ========================================================
-       DIVIDERS
-       ======================================================== */
-
-    hr {
-        border-color: #333333;
-    }
-
-    /* ========================================================
-       FOOTER
-       ======================================================== */
-
-    .footer {
-        text-align: center;
-        color: #777777;
-        font-size: 0.85rem;
-        padding: 2rem 0 1rem 0;
-    }
+.footer {
+    text-align: center;
+    color: #777777;
+    font-size: 0.85rem;
+    padding: 2rem 0 1rem 0;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -253,9 +188,7 @@ inventory["Expiry"] = pd.to_datetime(inventory["Expiry"])
 st.title("♻️ EXPIRY EXCHANGE")
 
 st.markdown(
-    '<div class="subtitle">'
-    "Don't buy new. Exchange what already exists."
-    "</div>",
+    '<div class="subtitle">Don\'t buy new. Exchange what already exists.</div>',
     unsafe_allow_html=True
 )
 
@@ -268,7 +201,7 @@ st.divider()
 
 
 # ============================================================
-# QUICK EXPLANATION
+# HOW IT WORKS
 # ============================================================
 
 st.markdown(
@@ -285,7 +218,7 @@ st.markdown(
 
 
 # ============================================================
-# MAIN COLUMNS
+# TWO MAIN SECTIONS
 # ============================================================
 
 col1, col2 = st.columns(2)
@@ -327,10 +260,6 @@ with col1:
         key="find_match"
     ):
 
-        # ----------------------------------------------------
-        # EXPIRY CALCULATION
-        # ----------------------------------------------------
-
         today = pd.Timestamp.today().normalize()
         expiry = pd.Timestamp(expiry_date)
 
@@ -338,10 +267,8 @@ with col1:
 
         if days_left <= 30:
             risk = "🔴 High"
-
         elif days_left <= 60:
             risk = "🟠 Medium"
-
         else:
             risk = "🟢 Low"
 
@@ -350,23 +277,18 @@ with col1:
         metric1, metric2 = st.columns(2)
 
         with metric1:
-
             st.metric(
                 "Days Until Expiry",
                 days_left
             )
 
         with metric2:
-
             st.metric(
                 "Expiry Risk",
                 risk
             )
 
-
-        # ----------------------------------------------------
-        # FIND MATCHES
-        # ----------------------------------------------------
+        # Find matching facilities
 
         matches = demand[
             (demand["Product"] == product) &
@@ -384,11 +306,9 @@ with col1:
                     <div class="match-box">
                         <b>🏥 {match['Facility']}</b><br><br>
                         Needs:
-                        <b>{match['Quantity Needed']:,}
-                        {product}</b><br>
+                        <b>{match['Quantity Needed']:,} {product}</b><br>
                         Available:
-                        <b>{quantity:,}
-                        {product}</b>
+                        <b>{quantity:,} {product}</b>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -398,10 +318,7 @@ with col1:
                     "✓ Quantity requirement satisfied."
                 )
 
-
-                # ------------------------------------------------
-                # FINANCIAL CALCULATION
-                # ------------------------------------------------
+                # Financial calculation
 
                 unit_price = product_prices[product]
 
@@ -410,42 +327,31 @@ with col1:
                     match["Quantity Needed"]
                 )
 
-                normal_cost = (
-                    matched_quantity * unit_price
-                )
+                normal_cost = matched_quantity * unit_price
 
-                exchange_cost = (
-                    normal_cost * 0.80
-                )
+                exchange_cost = normal_cost * 0.80
 
-                buyer_savings = (
-                    normal_cost - exchange_cost
-                )
+                buyer_savings = normal_cost - exchange_cost
 
-                platform_fee = (
-                    exchange_cost * 0.05
-                )
+                platform_fee = exchange_cost * 0.05
 
                 st.write("**Financial impact**")
 
                 money1, money2, money3 = st.columns(3)
 
                 with money1:
-
                     st.metric(
                         "Normal Purchase",
                         f"${normal_cost:,.2f}"
                     )
 
                 with money2:
-
                     st.metric(
                         "Buyer Saves",
                         f"${buyer_savings:,.2f}"
                     )
 
                 with money3:
-
                     st.metric(
                         "Platform Revenue",
                         f"${platform_fee:,.2f}"
@@ -453,20 +359,14 @@ with col1:
 
                 st.info(
                     f"♻️ {matched_quantity:,} units could be "
-                    f"redirected instead of requiring a new purchase."
+                    "redirected instead of requiring a new purchase."
                 )
-
-
-                # ------------------------------------------------
-                # PROPOSE EXCHANGE
-                # ------------------------------------------------
 
                 if st.button(
                     "🤝 Propose Exchange",
                     key=f"proposal_{match['Facility']}",
                     use_container_width=True
                 ):
-
                     st.success(
                         f"Exchange proposal created for "
                         f"{match['Facility']}."
@@ -528,25 +428,18 @@ with col2:
 
                 unit_price = product_prices[needed_product]
 
-                normal_cost = (
-                    needed_quantity * unit_price
-                )
+                normal_cost = needed_quantity * unit_price
 
-                exchange_cost = (
-                    normal_cost * 0.80
-                )
+                exchange_cost = normal_cost * 0.80
 
-                savings = (
-                    normal_cost - exchange_cost
-                )
+                savings = normal_cost - exchange_cost
 
                 st.markdown(
                     f"""
                     <div class="match-box">
                         <b>🏥 {supply['Facility']}</b><br><br>
                         Available:
-                        <b>{supply['Quantity']:,}
-                        {needed_product}</b><br>
+                        <b>{supply['Quantity']:,} {needed_product}</b><br>
                         Days until expiry:
                         <b>{days_left}</b>
                     </div>
@@ -559,11 +452,6 @@ with col2:
                     f"${savings:,.2f}"
                 )
 
-
-                # ------------------------------------------------
-                # REQUEST EXCHANGE
-                # ------------------------------------------------
-
                 if st.button(
                     "🤝 Request Exchange",
                     key=(
@@ -573,7 +461,6 @@ with col2:
                     ),
                     use_container_width=True
                 ):
-
                     st.success(
                         f"Exchange request sent to "
                         f"{supply['Facility']}."
@@ -599,8 +486,7 @@ st.subheader("📦 Example Inventory")
 display_inventory = inventory.copy()
 
 display_inventory["Expiry"] = (
-    display_inventory["Expiry"]
-    .dt.strftime("%Y-%m-%d")
+    display_inventory["Expiry"].dt.strftime("%Y-%m-%d")
 )
 
 st.dataframe(
@@ -611,7 +497,7 @@ st.dataframe(
 
 
 # ============================================================
-# HOW IT WORKS
+# HOW IT WORKS - DETAILED
 # ============================================================
 
 st.divider()
@@ -653,15 +539,6 @@ with step3:
 # ============================================================
 
 st.markdown(
-    """
-    <div class="footer">
-        ♻️ Consume less. Waste less. Exchange smarter.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-        ♻️ Consume less. Waste less. Exchange smarter.
-    </div>
-    """,
+    '<div class="footer">♻️ Consume less. Waste less. Exchange smarter.</div>',
     unsafe_allow_html=True
 )
