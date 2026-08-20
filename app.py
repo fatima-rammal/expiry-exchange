@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 
-# -----------------------------
-# Page setup
-# -----------------------------
+# ============================================================
+# PAGE SETUP
+# ============================================================
 
 st.set_page_config(
     page_title="Expiry Exchange",
@@ -11,9 +11,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# -----------------------------
-# Title
-# -----------------------------
+# ============================================================
+# TITLE
+# ============================================================
 
 st.title("♻️ EXPIRY EXCHANGE")
 
@@ -26,22 +26,23 @@ st.write(
 
 st.divider()
 
-# -----------------------------
-# Main choices
-# -----------------------------
+# ============================================================
+# MAIN COLUMNS
+# ============================================================
 
 col1, col2 = st.columns(2)
 
-# -----------------------------
+# ============================================================
 # I HAVE SURPLUS
-# -----------------------------
+# ============================================================
 
 with col1:
 
     st.subheader("🏥 I HAVE SURPLUS")
 
     st.write(
-        "Tell us about supplies you have available."
+        "Tell us about healthcare supplies "
+        "you have available."
     )
 
     product = st.selectbox(
@@ -61,9 +62,9 @@ with col1:
 
     if st.button("🔎 Find a Match"):
 
-        # -----------------------------
-        # Calculate expiry risk
-        # -----------------------------
+        # ----------------------------------------------------
+        # CALCULATE EXPIRY RISK
+        # ----------------------------------------------------
 
         today = pd.Timestamp.today().normalize()
         expiry = pd.Timestamp(expiry_date)
@@ -72,8 +73,10 @@ with col1:
 
         if days_left <= 30:
             risk = "🔴 High"
+
         elif days_left <= 60:
             risk = "🟠 Medium"
+
         else:
             risk = "🟢 Low"
 
@@ -84,11 +87,14 @@ with col1:
             days_left
         )
 
-        st.write("### Expiry Risk:", risk)
+        st.write(
+            "### Expiry Risk:",
+            risk
+        )
 
-        # -----------------------------
-        # Demand data
-        # -----------------------------
+        # ----------------------------------------------------
+        # DEMAND DATA
+        # ----------------------------------------------------
 
         demand = pd.DataFrame({
             "Facility": [
@@ -96,11 +102,13 @@ with col1:
                 "Community Clinic",
                 "University Hospital"
             ],
+
             "Product": [
                 "Gloves",
                 "Gauze",
                 "Gloves"
             ],
+
             "Quantity Needed": [
                 2000,
                 500,
@@ -108,14 +116,18 @@ with col1:
             ]
         })
 
-        # -----------------------------
-        # Find matches
-        # -----------------------------
+        # ----------------------------------------------------
+        # FIND MATCHES
+        # ----------------------------------------------------
 
         matches = demand[
             (demand["Product"] == product) &
             (demand["Quantity Needed"] <= quantity)
         ]
+
+        # ----------------------------------------------------
+        # DISPLAY MATCHES
+        # ----------------------------------------------------
 
         if len(matches) > 0:
 
@@ -124,8 +136,12 @@ with col1:
             for _, match in matches.iterrows():
 
                 st.write(
-                    f"🏥 **{match['Facility']}** needs "
-                    f"**{match['Quantity Needed']:,} {product}**"
+                    f"🏥 **{match['Facility']}**"
+                )
+
+                st.write(
+                    f"Needs: **{match['Quantity Needed']:,} "
+                    f"{product}**"
                 )
 
                 st.write(
@@ -137,9 +153,9 @@ with col1:
                     "✅ Quantity requirement satisfied!"
                 )
 
-                # -----------------------------
-                # Financial impact
-                # -----------------------------
+                # ------------------------------------------------
+                # FINANCIAL IMPACT
+                # ------------------------------------------------
 
                 unit_price = 0.40
 
@@ -148,48 +164,76 @@ with col1:
                     match["Quantity Needed"]
                 )
 
+                # Normal purchase cost
                 normal_cost = (
                     matched_quantity * unit_price
                 )
 
+                # 20% discount through Expiry Exchange
                 exchange_cost = (
                     normal_cost * 0.80
                 )
 
+                # Buyer savings
                 buyer_savings = (
                     normal_cost - exchange_cost
                 )
 
+                # 5% platform transaction fee
                 platform_fee = (
                     exchange_cost * 0.05
                 )
 
                 st.subheader("💰 Financial Impact")
 
-                col_a, col_b, col_c = st.columns(3)
+                financial_col1, financial_col2, financial_col3 = (
+                    st.columns(3)
+                )
 
-                with col_a:
+                with financial_col1:
+
                     st.metric(
                         "Normal Purchase",
                         f"${normal_cost:,.2f}"
                     )
 
-                with col_b:
+                with financial_col2:
+
                     st.metric(
                         "Buyer Saves",
                         f"${buyer_savings:,.2f}"
                     )
 
-                with col_c:
+                with financial_col3:
+
                     st.metric(
                         "Platform Revenue",
                         f"${platform_fee:,.2f}"
                     )
 
                 st.info(
-                    f"♻️ {matched_quantity:,} units could be "
+                    f"♻️ **{matched_quantity:,} units** could be "
                     f"redirected instead of requiring a new purchase."
                 )
+
+                # ------------------------------------------------
+                # PROPOSE EXCHANGE
+                # ------------------------------------------------
+
+                if st.button(
+                    "🤝 Propose Exchange",
+                    key=f"proposal_{match['Facility']}"
+                ):
+
+                    st.success(
+                        f"🎉 Exchange proposal created for "
+                        f"{match['Facility']}!"
+                    )
+
+                    st.write(
+                        "The receiving facility can review "
+                        "the available quantity and proposed exchange."
+                    )
 
         else:
 
@@ -199,9 +243,9 @@ with col1:
             )
 
 
-# -----------------------------
+# ============================================================
 # I NEED SUPPLIES
-# -----------------------------
+# ============================================================
 
 with col2:
 
@@ -213,43 +257,49 @@ with col2:
     )
 
     st.info(
-        "The matching system will be available here."
+        "The demand-side matching system "
+        "will be available here."
     )
 
 
-# -----------------------------
-# Example inventory
-# -----------------------------
+# ============================================================
+# EXAMPLE INVENTORY
+# ============================================================
 
 st.divider()
 
 st.subheader("📦 Example Inventory")
 
 inventory = pd.DataFrame({
+
     "Facility": [
         "City Hospital",
         "City Hospital",
         "Medical Center",
         "Community Clinic"
     ],
+
     "Product": [
         "Gauze",
         "Gloves",
         "Gauze",
         "Gloves"
     ],
+
     "Quantity": [
         1000,
         5000,
         200,
         3000
     ],
+
     "Expiry": [
         "2026-11-15",
         "2026-10-20",
         "2026-12-10",
         "2026-09-30"
     ],
+
     "Unit Price": [
         1.00,
         0.40,
@@ -257,6 +307,49 @@ inventory = pd.DataFrame({
         0.40
     ]
 })
+
+st.dataframe(
+    inventory,
+    use_container_width=True
+)
+
+
+# ============================================================
+# HOW IT WORKS
+# ============================================================
+
+st.divider()
+
+st.subheader("💡 How Expiry Exchange Works")
+
+step1, step2, step3 = st.columns(3)
+
+with step1:
+
+    st.write("### 1️⃣ List")
+
+    st.write(
+        "Healthcare facilities list surplus "
+        "supplies that may expire."
+    )
+
+with step2:
+
+    st.write("### 2️⃣ Match")
+
+    st.write(
+        "Expiry Exchange identifies facilities "
+        "that need those supplies."
+    )
+
+with step3:
+
+    st.write("### 3️⃣ Exchange")
+
+    st.write(
+        "The buyer saves money, surplus is reused, "
+        "and Expiry Exchange earns a small transaction fee."
+    )
 
 st.dataframe(
     inventory,
