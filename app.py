@@ -83,7 +83,8 @@ p {
 
 .stSelectbox > div > div,
 .stNumberInput > div > div,
-.stDateInput > div > div {
+.stDateInput > div > div,
+.stTextInput > div > div {
     background-color: #111111 !important;
 }
 
@@ -108,7 +109,7 @@ hr {
 
 
 # ============================================================
-# DEMO PRICES
+# PRODUCT PRICES
 # ============================================================
 
 prices = {
@@ -119,33 +120,10 @@ prices = {
 
 
 # ============================================================
-# DEMO DEMAND
+# INITIAL DEMO INVENTORY
 # ============================================================
 
-demand = pd.DataFrame({
-    "Facility": [
-        "Medical Center",
-        "Community Clinic",
-        "University Hospital"
-    ],
-    "Product": [
-        "Gloves",
-        "Gauze",
-        "Gloves"
-    ],
-    "Quantity Needed": [
-        2000,
-        500,
-        1500
-    ]
-})
-
-
-# ============================================================
-# DEMO SURPLUS INVENTORY
-# ============================================================
-
-inventory = pd.DataFrame({
+initial_inventory = pd.DataFrame({
     "Facility": [
         "City Hospital",
         "City Hospital",
@@ -172,7 +150,18 @@ inventory = pd.DataFrame({
     ]
 })
 
-inventory["Expiry"] = pd.to_datetime(inventory["Expiry"])
+initial_inventory["Expiry"] = pd.to_datetime(
+    initial_inventory["Expiry"]
+)
+
+
+# ============================================================
+# STORE INVENTORY IN SESSION
+# ============================================================
+
+if "inventory" not in st.session_state:
+
+    st.session_state.inventory = initial_inventory.copy()
 
 
 # ============================================================
@@ -188,8 +177,9 @@ st.title("Healthcare surplus, before it expires.")
 
 st.markdown(
     '<div class="subtitle">'
-    "Connect healthcare facilities with unused supplies "
-    "before they expire, reducing waste and unnecessary purchases."
+    "A marketplace for unused healthcare supplies. "
+    "Facilities with surplus can list it, while facilities "
+    "in need can find it before buying new."
     "</div>",
     unsafe_allow_html=True
 )
@@ -206,24 +196,36 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+total_units = int(
+    st.session_state.inventory["Quantity"].sum()
+)
+
+estimated_value = sum(
+    row["Quantity"] * prices[row["Product"]]
+    for _, row in st.session_state.inventory.iterrows()
+)
+
 dashboard1, dashboard2, dashboard3 = st.columns(3)
 
 with dashboard1:
+
     st.metric(
-        "Supplies available",
-        "9,200"
+        "Supplies listed",
+        f"{total_units:,}"
     )
 
 with dashboard2:
+
     st.metric(
-        "Potential savings",
-        "$3,280"
+        "Estimated value",
+        f"${estimated_value:,.0f}"
     )
 
 with dashboard3:
+
     st.metric(
         "Waste potentially diverted",
-        "9,200 units"
+        f"{total_units:,} units"
     )
 
 
@@ -244,14 +246,20 @@ left, right = st.columns(2)
 with left:
 
     st.markdown(
-        '<div class="section-label">SURPLUS</div>',
+        '<div class="section-label">SUPPLIER</div>',
         unsafe_allow_html=True
     )
 
     st.header("I have surplus")
 
     st.write(
-        "List supplies your facility no longer needs."
+        "List extra supplies so another facility can use them."
+    )
+
+    facility_name = st.text_input(
+        "Facility name",
+        placeholder="e.g. City Hospital",
+        key="facility_name"
     )
 
     surplus_product = st.selectbox(
@@ -273,11 +281,51 @@ with left:
         key="surplus_expiry"
     )
 
-    find_match = st.button(
-        "Find a facility",
+    list_surplus = st.button(
+        "List Surplus",
         use_container_width=True,
-        key="find_match"
+        key="list_surplus"
     )
+
+
+# ============================================================
+# ADD SURPLUS TO MARKETPLACE
+# ============================================================
+
+if list_surplus:
+
+    if facility_name.strip() == "":
+
+        st.warning(
+            "Please enter your facility name."
+        )
+
+    else:
+
+        new_supply = pd.DataFrame({
+            "Facility": [facility_name],
+            "Product": [surplus_product],
+            "Quantity": [surplus_quantity],
+            "Expiry": [pd.Timestamp(surplus_expiry)]
+        })
+
+        st.session_state.inventory = pd.concat(
+            [
+                st.session_state.inventory,
+                new_supply
+            ],
+            ignore_index=True
+        )
+
+        st.success(
+            f"✓ {surplus_quantity:,} {surplus_product} "
+            f"listed successfully."
+        )
+
+        st.info(
+            "Your surplus is now visible to facilities "
+            "looking for this supply."
+        )
 
 
 # ============================================================
@@ -287,7 +335,7 @@ with left:
 with right:
 
     st.markdown(
-        '<div class="section-label">DEMAND</div>',
+        '<div class="section-label">BUYER</div>',
         unsafe_allow_html=True
     )
 
@@ -312,172 +360,14 @@ with right:
     )
 
     search_surplus = st.button(
-        "Search surplus",
+        "Search Surplus",
         use_container_width=True,
         key="search_surplus"
     )
 
 
 # ============================================================
-# FEATURE 1 + 2 + 3
-# PARTIAL MATCHING + EXPIRY RISK + SAVINGS
-# ============================================================
-
-if find_match:
-
-    st.divider()
-
-    st.markdown(
-        '<div class="section-label">MATCH RESULTS</div>',
-        unsafe_allow_html=True
-    )
-
-    matches = demand[
-        demand["Product"] == surplus_product
-    ].copy()
-
-    if len(matches) == 0:
-
-        st.warning(
-            "No facility currently needs this supply."
-        )
-
-    else:
-
-        today = pd.Timestamp.today().normalize()
-
-        expiry = pd.Timestamp(surplus_expiry)
-
-        days_left = (expiry - today).days
-
-
-        # ----------------------------------------------------
-        # EXPIRY RISK
-        # ----------------------------------------------------
-
-        if days_left <= 30:
-
-            risk = "HIGH"
-            risk_message = "This supply should be exchanged soon."
-
-        elif days_left <= 60:
-
-            risk = "MEDIUM"
-            risk_message = "This supply should be considered soon."
-
-        else:
-
-            risk = "LOW"
-            risk_message = "There is more time before expiry."
-
-
-        st.subheader("Facilities that may need this supply")
-
-        st.caption(
-            f"Expiry risk: {risk} · {risk_message}"
-        )
-
-
-        # ----------------------------------------------------
-        # SORT BY DEMAND
-        # ----------------------------------------------------
-
-        matches = matches.sort_values(
-            by="Quantity Needed",
-            ascending=True
-        )
-
-
-        for _, match in matches.iterrows():
-
-            # ------------------------------------------------
-            # PARTIAL MATCH
-            # ------------------------------------------------
-
-            matched_quantity = min(
-                surplus_quantity,
-                match["Quantity Needed"]
-            )
-
-            remaining_demand = (
-                match["Quantity Needed"]
-                - matched_quantity
-            )
-
-
-            # ------------------------------------------------
-            # FINANCIAL CALCULATION
-            # ------------------------------------------------
-
-            normal_cost = (
-                matched_quantity
-                * prices[surplus_product]
-            )
-
-            exchange_cost = normal_cost * 0.80
-
-            savings = normal_cost - exchange_cost
-
-
-            st.write("")
-
-            st.write(
-                f"### {match['Facility']}"
-            )
-
-            st.caption(
-                f"Needs {match['Quantity Needed']:,} "
-                f"{surplus_product} · "
-                f"You have {surplus_quantity:,}"
-            )
-
-
-            result1, result2, result3 = st.columns(3)
-
-            with result1:
-
-                st.metric(
-                    "Matched",
-                    f"{matched_quantity:,}"
-                )
-
-            with result2:
-
-                st.metric(
-                    "Demand remaining",
-                    f"{remaining_demand:,}"
-                )
-
-            with result3:
-
-                st.metric(
-                    "Buyer saving",
-                    f"${savings:,.2f}"
-                )
-
-
-            st.info(
-                f"Partial exchange possible: "
-                f"{matched_quantity:,} units can be redirected."
-            )
-
-
-            if st.button(
-                "Propose exchange",
-                key=f"propose_{match['Facility']}",
-                use_container_width=True
-            ):
-
-                st.success(
-                    f"Proposal sent to {match['Facility']}."
-                )
-
-
-            st.divider()
-
-
-# ============================================================
-# SEARCH AVAILABLE SURPLUS
+# SEARCH MARKETPLACE
 # ============================================================
 
 if search_surplus:
@@ -485,21 +375,28 @@ if search_surplus:
     st.divider()
 
     st.markdown(
-        '<div class="section-label">AVAILABLE SURPLUS</div>',
+        '<div class="section-label">MARKETPLACE RESULTS</div>',
         unsafe_allow_html=True
     )
 
-    available = inventory[
-        (inventory["Product"] == needed_product)
+    available = st.session_state.inventory[
+        (
+            st.session_state.inventory["Product"]
+            == needed_product
+        )
         &
-        (inventory["Quantity"] > 0)
+        (
+            st.session_state.inventory["Quantity"]
+            > 0
+        )
     ].copy()
 
 
     if len(available) == 0:
 
         st.warning(
-            "No suitable surplus is currently available."
+            "No surplus is currently available "
+            "for this supply."
         )
 
     else:
@@ -511,27 +408,27 @@ if search_surplus:
         ).dt.days
 
 
-        # ----------------------------------------------------
-        # SORT BY EXPIRY
-        # MOST URGENT FIRST
-        # ----------------------------------------------------
-
+        # Closest expiry first
         available = available.sort_values(
             by="Days Left",
             ascending=True
         )
 
 
-        st.subheader("Available surplus")
+        st.subheader(
+            f"Surplus available for {needed_product}"
+        )
 
         st.caption(
             "Supplies closest to expiry are shown first."
         )
 
 
-        for _, supply in available.iterrows():
+        for index, supply in available.iterrows():
 
-            days_left = supply["Days Left"]
+            days_left = int(
+                supply["Days Left"]
+            )
 
 
             # ------------------------------------------------
@@ -552,12 +449,12 @@ if search_surplus:
 
 
             # ------------------------------------------------
-            # PARTIAL QUANTITY
+            # PARTIAL MATCH
             # ------------------------------------------------
 
             matched_quantity = min(
                 needed_quantity,
-                supply["Quantity"]
+                int(supply["Quantity"])
             )
 
             remaining_need = (
@@ -575,10 +472,56 @@ if search_surplus:
                 * prices[needed_product]
             )
 
-            exchange_cost = normal_cost * 0.80
+            exchange_cost = (
+                normal_cost * 0.80
+            )
 
-            savings = normal_cost - exchange_cost
+            savings = (
+                normal_cost
+                - exchange_cost
+            )
 
+
+            # ------------------------------------------------
+            # MATCH SCORE
+            # ------------------------------------------------
+
+            score = 50
+
+
+            if matched_quantity == needed_quantity:
+
+                score += 20
+
+            else:
+
+                score += 10
+
+
+            if days_left <= 30:
+
+                score += 20
+
+            elif days_left <= 60:
+
+                score += 10
+
+            else:
+
+                score += 5
+
+
+            if days_left >= 0:
+
+                score += 10
+
+
+            score = min(score, 100)
+
+
+            # ------------------------------------------------
+            # RESULT
+            # ------------------------------------------------
 
             st.write("")
 
@@ -588,29 +531,38 @@ if search_surplus:
 
             st.caption(
                 f"{supply['Quantity']:,} "
-                f"{needed_product} available · "
-                f"Expires in {days_left} days · "
-                f"Risk: {risk}"
+                f"{needed_product} available"
             )
 
 
-            result1, result2, result3 = st.columns(3)
+            result1, result2, result3, result4 = st.columns(4)
+
 
             with result1:
 
                 st.metric(
-                    "Matched",
-                    f"{matched_quantity:,}"
+                    "Match",
+                    f"{score}%"
                 )
+
 
             with result2:
 
                 st.metric(
-                    "Still needed",
-                    f"{remaining_need:,}"
+                    "Available",
+                    f"{int(supply['Quantity']):,}"
                 )
 
+
             with result3:
+
+                st.metric(
+                    "Expires in",
+                    f"{days_left} days"
+                )
+
+
+            with result4:
 
                 st.metric(
                     "Your saving",
@@ -618,14 +570,73 @@ if search_surplus:
                 )
 
 
+            # ------------------------------------------------
+            # WHY THIS MATCH?
+            # ------------------------------------------------
+
+            st.write(
+                f"**Why this match?** "
+                f"Same supply ✓ · "
+                f"{matched_quantity:,} units can be matched ✓ · "
+                f"Expiry risk: {risk}"
+            )
+
+
+            if remaining_need > 0:
+
+                st.info(
+                    f"Partial exchange: "
+                    f"{matched_quantity:,} units available. "
+                    f"You would still need "
+                    f"{remaining_need:,} units."
+                )
+
+            else:
+
+                st.success(
+                    "This surplus can cover your full request."
+                )
+
+
+            # ------------------------------------------------
+            # REQUEST EXCHANGE
+            # ------------------------------------------------
+
+            button_key = (
+                f"request_"
+                f"{supply['Facility']}_"
+                f"{needed_product}_"
+                f"{index}"
+            )
+
+
             if st.button(
-                "Request exchange",
-                key=f"request_{supply['Facility']}_{needed_product}",
+                "Request Exchange",
+                key=button_key,
                 use_container_width=True
             ):
 
                 st.success(
-                    f"Request sent to {supply['Facility']}."
+                    "✓ Exchange request submitted!"
+                )
+
+                st.write(
+                    f"**{matched_quantity:,} "
+                    f"{needed_product}**"
+                )
+
+                st.write(
+                    f"From: **{supply['Facility']}**"
+                )
+
+                st.write(
+                    f"Estimated saving: "
+                    f"**${savings:,.2f}**"
+                )
+
+                st.write(
+                    f"Potential waste diverted: "
+                    f"**{matched_quantity:,} units**"
                 )
 
 
@@ -644,10 +655,10 @@ st.markdown(
 st.header("Buy new or exchange?")
 
 
-calc_col1, calc_col2 = st.columns(2)
+calc1, calc2 = st.columns(2)
 
 
-with calc_col1:
+with calc1:
 
     calculator_product = st.selectbox(
         "Product",
@@ -664,14 +675,16 @@ with calc_col1:
     )
 
 
-with calc_col2:
+with calc2:
 
     normal_price = (
         calculator_quantity
         * prices[calculator_product]
     )
 
-    exchange_price = normal_price * 0.80
+    exchange_price = (
+        normal_price * 0.80
+    )
 
     calculator_saving = (
         normal_price
@@ -689,7 +702,8 @@ with calc_col2:
     )
 
     st.success(
-        f"Estimated saving: ${calculator_saving:,.2f}"
+        f"Estimated saving: "
+        f"${calculator_saving:,.2f}"
     )
 
 
@@ -704,28 +718,30 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.header("We make money when facilities save money.")
+st.header(
+    "We make money when facilities save money."
+)
 
-business_col1, business_col2 = st.columns(2)
+business1, business2 = st.columns(2)
 
 
-with business_col1:
+with business1:
 
     st.write(
-        "Expiry Exchange charges a small transaction fee "
-        "when a successful exchange is completed."
+        "Expiry Exchange charges a small transaction "
+        "fee when an exchange is completed."
     )
 
     st.write(
-        "The buyer spends less, the supplier reduces "
+        "The buyer pays less, the supplier reduces "
         "waste, and the platform earns from the transaction."
     )
 
 
-with business_col2:
+with business2:
 
     st.metric(
-        "Illustrative transaction fee",
+        "Illustrative platform fee",
         "5%"
     )
 
@@ -735,17 +751,21 @@ with business_col2:
 
 
 # ============================================================
-# DEMO INVENTORY
+# CURRENT MARKETPLACE
 # ============================================================
 
 st.divider()
 
 st.markdown(
-    '<div class="section-label">DEMO INVENTORY</div>',
+    '<div class="section-label">CURRENT MARKETPLACE</div>',
     unsafe_allow_html=True
 )
 
-display_inventory = inventory.copy()
+st.write(
+    "Supplies currently listed on Expiry Exchange:"
+)
+
+display_inventory = st.session_state.inventory.copy()
 
 display_inventory["Expiry"] = (
     display_inventory["Expiry"]
@@ -757,6 +777,49 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+
+
+# ============================================================
+# HOW IT WORKS
+# ============================================================
+
+st.divider()
+
+st.markdown(
+    '<div class="section-label">HOW IT WORKS</div>',
+    unsafe_allow_html=True
+)
+
+step1, step2, step3 = st.columns(3)
+
+with step1:
+
+    st.subheader("01 · List")
+
+    st.write(
+        "A facility lists unused supplies "
+        "before they expire."
+    )
+
+
+with step2:
+
+    st.subheader("02 · Match")
+
+    st.write(
+        "Facilities in need search the "
+        "available surplus."
+    )
+
+
+with step3:
+
+    st.subheader("03 · Exchange")
+
+    st.write(
+        "The buyer saves money while "
+        "preventing unnecessary waste."
+    )
 
 
 # ============================================================
