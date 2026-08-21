@@ -223,7 +223,3 @@ st.dataframe(inventory, use_container_width=True, hide_index=True)
 st.divider()
 st.caption("EXPIRY EXCHANGE · Prototype")
 st.divider()
-
-st.caption(
-    "EXPIRY EXCHANGE · Prototype"
-)
