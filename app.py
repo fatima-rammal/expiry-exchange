@@ -16,9 +16,13 @@ st.markdown("""
 <style>
 .stApp {
     background-color: #F5F5F5;
+    color: #222222;
 }
 h1, h2, h3 {
     color: #D94A3A !important;
+}
+p, span, label, div {
+    color: #222222;
 }
 </style>
 """, unsafe_allow_html=True)
