@@ -10,6 +10,19 @@ from datetime import date
 
 st.set_page_config(page_title="Expiry Exchange", page_icon="♻", layout="wide")
 
+# A little bit of custom styling: lighter background, red headings.
+# st.markdown with unsafe_allow_html=True lets us inject raw CSS.
+st.markdown("""
+<style>
+.stApp {
+    background-color: #F5F5F5;
+}
+h1, h2, h3 {
+    color: #D94A3A !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # A dictionary is just a lookup table: "product name" -> price per unit
 PRICES = {
     "Gauze": 1.00,
@@ -222,4 +235,3 @@ st.dataframe(inventory, use_container_width=True, hide_index=True)
 
 st.divider()
 st.caption("EXPIRY EXCHANGE · Prototype")
-st.divider()
