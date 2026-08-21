@@ -27,7 +27,10 @@ p, span, label, div {
 .stSelectbox > div > div,
 .stNumberInput > div > div,
 .stDateInput > div > div,
-.stTextInput > div > div {
+.stTextInput > div > div,
+[data-baseweb="select"] > div,
+[data-baseweb="input"],
+[data-baseweb="base-input"] {
     background-color: #D94A3A !important;
     color: white !important;
 }
