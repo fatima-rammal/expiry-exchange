@@ -8,7 +8,7 @@ from datetime import date
 # you turn a plain Python script into a website.
 # ------------------------------------------------------------------
 
-st.set_page_config(page_title="Expiry Exchange", page_icon="♻", layout="wide")
+st.set_page_config(page_title="Expiry Exchange", page_icon="⚕️", layout="wide")
 
 # A little bit of custom styling: lighter background, red headings.
 # st.markdown with unsafe_allow_html=True lets us inject raw CSS.
@@ -107,7 +107,7 @@ inventory = st.session_state.inventory
 # HEADER
 # ------------------------------------------------------------------
 
-st.title("Healthcare surplus, before it expires.")
+st.title("⚕️ Healthcare surplus, before it expires.")
 st.write(
     "A marketplace for unused healthcare supplies. Facilities with surplus "
     "can list it, while facilities in need can find it before buying new."
@@ -129,9 +129,9 @@ for item in inventory:
     estimated_value += item["quantity"] * PRICES[item["product"]]
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Supplies listed", f"{total_units:,}")
-col2.metric("Estimated value", f"${estimated_value:,.0f}")
-col3.metric("Waste potentially diverted", f"{total_units:,} units")
+col1.metric("📦 Supplies listed", f"{total_units:,}")
+col2.metric("💰 Estimated value", f"${estimated_value:,.0f}")
+col3.metric("♻️ Waste potentially diverted", f"{total_units:,} units")
 
 st.divider()
 
@@ -143,7 +143,7 @@ st.divider()
 left, right = st.columns(2)
 
 with left:
-    st.header("I have surplus")
+    st.header("🏥 I have surplus")
     st.write("List extra supplies so another facility can use them.")
 
     facility_name = st.text_input("Facility name", placeholder="e.g. City Hospital")
@@ -167,7 +167,7 @@ if list_surplus_clicked:
         st.success(f"✓ {surplus_quantity:,} {surplus_product} listed successfully.")
 
 with right:
-    st.header("I need supplies")
+    st.header("🩺 I need supplies")
     st.write("Search existing surplus before buying new stock.")
 
     needed_product = st.selectbox("Supply needed", list(PRICES.keys()), key="needed_product")
@@ -181,7 +181,7 @@ with right:
 
 if search_clicked:
     st.divider()
-    st.subheader(f"Surplus available for {needed_product}")
+    st.subheader(f"💊 Surplus available for {needed_product}")
 
     # Build a list of only the listings that match what's needed
     matches = []
@@ -254,7 +254,7 @@ if search_clicked:
 # SAVINGS CALCULATOR
 # ------------------------------------------------------------------
 
-st.header("Buy new or exchange?")
+st.header("🧮 Buy new or exchange?")
 
 calc1, calc2 = st.columns(2)
 
@@ -277,7 +277,7 @@ with calc2:
 # ------------------------------------------------------------------
 
 st.divider()
-st.header("Live marketplace")
+st.header("📋 Live marketplace")
 st.write("All currently listed surplus supplies:")
 
 # st.table / st.dataframe can display a list of dictionaries directly,
