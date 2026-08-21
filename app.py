@@ -40,6 +40,21 @@ p, span, label, div {
 .stTextInput input {
     color: white !important;
 }
+[data-baseweb="menu"],
+[data-baseweb="popover"] {
+    background-color: #D94A3A !important;
+}
+[data-baseweb="menu"] li,
+ul[role="listbox"] li,
+li[role="option"] {
+    background-color: #D94A3A !important;
+    color: white !important;
+}
+li[role="option"]:hover,
+li[aria-selected="true"] {
+    background-color: #B83B2E !important;
+    color: white !important;
+}
 [data-testid="stMetricValue"] {
     color: #222222 !important;
 }
