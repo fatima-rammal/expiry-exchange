@@ -822,8 +822,3 @@ st.divider()
 st.caption(
     "EXPIRY EXCHANGE · Prototype"
 )
-st.divider()
-
-st.caption(
-    "EXPIRY EXCHANGE · Prototype"
-)
