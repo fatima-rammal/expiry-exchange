@@ -40,6 +40,11 @@ p, span, label, div {
 .stTextInput input {
     color: white !important;
 }
+.stButton > button {
+    background-color: #D94A3A !important;
+    color: white !important;
+    border: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -250,6 +255,11 @@ st.dataframe(inventory, use_container_width=True, hide_index=True)
 
 
 # ------------------------------------------------------------------
+# FOOTER
+# ------------------------------------------------------------------
+
+st.divider()
+st.caption("EXPIRY EXCHANGE · Prototype")
 # FOOTER
 # ------------------------------------------------------------------
 
