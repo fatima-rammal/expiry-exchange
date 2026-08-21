@@ -15,14 +15,14 @@ st.set_page_config(page_title="Expiry Exchange", page_icon="♻", layout="wide")
 st.markdown("""
 <style>
 .stApp {
-    background-color: #F5F5F5;
-    color: #222222;
+    background-color: #0A0A0A;
+    color: #FFFFFF;
 }
 h1, h2, h3 {
     color: #D94A3A !important;
 }
 p, span, label, div {
-    color: #222222;
+    color: #FFFFFF;
 }
 .stSelectbox > div > div,
 .stNumberInput > div > div,
@@ -56,7 +56,7 @@ li[aria-selected="true"] {
     color: white !important;
 }
 [data-testid="stMetricValue"] {
-    color: #222222 !important;
+    color: #FFFFFF !important;
 }
 [data-testid="stMetricLabel"] {
     color: #D94A3A !important;
