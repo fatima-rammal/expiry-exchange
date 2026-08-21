@@ -24,6 +24,19 @@ h1, h2, h3 {
 p, span, label, div {
     color: #222222;
 }
+.stSelectbox > div > div,
+.stNumberInput > div > div,
+.stDateInput > div > div,
+.stTextInput > div > div {
+    background-color: #D94A3A !important;
+    color: white !important;
+}
+.stSelectbox input,
+.stNumberInput input,
+.stDateInput input,
+.stTextInput input {
+    color: white !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
