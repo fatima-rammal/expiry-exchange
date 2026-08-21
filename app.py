@@ -120,7 +120,7 @@ prices = {
 
 
 # ============================================================
-# INITIAL DEMO INVENTORY
+# INITIAL MARKETPLACE DATA
 # ============================================================
 
 initial_inventory = pd.DataFrame({
@@ -156,7 +156,7 @@ initial_inventory["Expiry"] = pd.to_datetime(
 
 
 # ============================================================
-# STORE INVENTORY IN SESSION
+# CREATE LIVE INVENTORY
 # ============================================================
 
 if "inventory" not in st.session_state:
@@ -188,7 +188,7 @@ st.write("")
 
 
 # ============================================================
-# IMPACT DASHBOARD
+# LIVE IMPACT DASHBOARD
 # ============================================================
 
 st.markdown(
@@ -200,10 +200,15 @@ total_units = int(
     st.session_state.inventory["Quantity"].sum()
 )
 
-estimated_value = sum(
-    row["Quantity"] * prices[row["Product"]]
-    for _, row in st.session_state.inventory.iterrows()
-)
+estimated_value = 0
+
+for _, row in st.session_state.inventory.iterrows():
+
+    estimated_value += (
+        row["Quantity"]
+        * prices[row["Product"]]
+    )
+
 
 dashboard1, dashboard2, dashboard3 = st.columns(3)
 
@@ -233,7 +238,7 @@ st.divider()
 
 
 # ============================================================
-# TWO MAIN FUNCTIONS
+# MAIN FUNCTIONS
 # ============================================================
 
 left, right = st.columns(2)
@@ -289,7 +294,7 @@ with left:
 
 
 # ============================================================
-# ADD SURPLUS TO MARKETPLACE
+# ADD NEW SURPLUS
 # ============================================================
 
 if list_surplus:
@@ -318,13 +323,13 @@ if list_surplus:
         )
 
         st.success(
-            f"✓ {surplus_quantity:,} {surplus_product} "
-            f"listed successfully."
+            f"✓ {surplus_quantity:,} "
+            f"{surplus_product} listed successfully."
         )
 
         st.info(
-            "Your surplus is now visible to facilities "
-            "looking for this supply."
+            "Your surplus is now visible in the "
+            "live marketplace."
         )
 
 
@@ -367,7 +372,7 @@ with right:
 
 
 # ============================================================
-# SEARCH MARKETPLACE
+# SEARCH LIVE MARKETPLACE
 # ============================================================
 
 if search_surplus:
@@ -407,13 +412,10 @@ if search_surplus:
             available["Expiry"] - today
         ).dt.days
 
-
-        # Closest expiry first
         available = available.sort_values(
             by="Days Left",
             ascending=True
         )
-
 
         st.subheader(
             f"Surplus available for {needed_product}"
@@ -488,7 +490,6 @@ if search_surplus:
 
             score = 50
 
-
             if matched_quantity == needed_quantity:
 
                 score += 20
@@ -496,7 +497,6 @@ if search_surplus:
             else:
 
                 score += 10
-
 
             if days_left <= 30:
 
@@ -510,11 +510,9 @@ if search_surplus:
 
                 score += 5
 
-
             if days_left >= 0:
 
                 score += 10
-
 
             score = min(score, 100)
 
@@ -530,7 +528,7 @@ if search_surplus:
             )
 
             st.caption(
-                f"{supply['Quantity']:,} "
+                f"{int(supply['Quantity']):,} "
                 f"{needed_product} available"
             )
 
@@ -570,10 +568,6 @@ if search_surplus:
                 )
 
 
-            # ------------------------------------------------
-            # WHY THIS MATCH?
-            # ------------------------------------------------
-
             st.write(
                 f"**Why this match?** "
                 f"Same supply ✓ · "
@@ -597,10 +591,6 @@ if search_surplus:
                     "This surplus can cover your full request."
                 )
 
-
-            # ------------------------------------------------
-            # REQUEST EXCHANGE
-            # ------------------------------------------------
 
             button_key = (
                 f"request_"
@@ -644,7 +634,7 @@ if search_surplus:
 
 
 # ============================================================
-# BUY VS EXCHANGE CALCULATOR
+# SAVINGS CALCULATOR
 # ============================================================
 
 st.markdown(
@@ -751,18 +741,18 @@ with business2:
 
 
 # ============================================================
-# CURRENT MARKETPLACE
+# LIVE MARKETPLACE
 # ============================================================
 
 st.divider()
 
 st.markdown(
-    '<div class="section-label">CURRENT MARKETPLACE</div>',
+    '<div class="section-label">LIVE MARKETPLACE</div>',
     unsafe_allow_html=True
 )
 
 st.write(
-    "Supplies currently listed on Expiry Exchange:"
+    "All currently listed surplus supplies:"
 )
 
 display_inventory = st.session_state.inventory.copy()
@@ -791,6 +781,7 @@ st.markdown(
 )
 
 step1, step2, step3 = st.columns(3)
+
 
 with step1:
 
@@ -826,6 +817,11 @@ with step3:
 # FOOTER
 # ============================================================
 
+st.divider()
+
+st.caption(
+    "EXPIRY EXCHANGE · Prototype"
+)
 st.divider()
 
 st.caption(
