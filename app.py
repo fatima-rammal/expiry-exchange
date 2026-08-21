@@ -40,6 +40,12 @@ p, span, label, div {
 .stTextInput input {
     color: white !important;
 }
+[data-testid="stMetricValue"] {
+    color: #222222 !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #D94A3A !important;
+}
 .stButton > button {
     background-color: #D94A3A !important;
     color: white !important;
@@ -216,6 +222,16 @@ if search_clicked:
             else:
                 st.success("This surplus can cover your full request.")
 
+            # Each button on the page needs a unique "key" so Streamlit
+            # can tell them apart -- we build one from the facility name.
+            button_key = f"request_{item['facility']}_{needed_product}"
+
+            if st.button("Request Exchange", key=button_key, use_container_width=True):
+                st.success("✓ Exchange request submitted!")
+                st.write(f"**{matched_qty:,} {needed_product}**")
+                st.write(f"From: **{item['facility']}**")
+                st.write(f"Estimated saving: **${savings:,.2f}**")
+
             st.divider()
 
 
@@ -255,11 +271,6 @@ st.dataframe(inventory, use_container_width=True, hide_index=True)
 
 
 # ------------------------------------------------------------------
-# FOOTER
-# ------------------------------------------------------------------
-
-st.divider()
-st.caption("EXPIRY EXCHANGE · Prototype")
 # FOOTER
 # ------------------------------------------------------------------
 
